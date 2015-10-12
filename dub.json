@@ -1,0 +1,9 @@
+{
+	"name": "eventsystem",
+	"description": "Super tiny event system using delegates",
+	"copyright": "Copyright © 2015, webfreak",
+	"license": "public domain",
+	"authors": ["webfreak"],
+	"dependencies":
+	{}
+}
