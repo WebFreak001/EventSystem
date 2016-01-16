@@ -1,5 +1,10 @@
 .dub
 docs.json
+docs/
 __dummy.html
 *.o
+*.a
 *.obj
+__test__library__
+dub.selections.json
+eventsystem
