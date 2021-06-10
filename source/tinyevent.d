@@ -1,9 +1,9 @@
 module tinyevent;
 
 /// Defines a regular event
-alias Event(Args...) = void delegate(Args)[];
+alias Event(Args...) = void delegate(Args) @safe [];
 /// Defines a cancelable event by returning false to cancel
-alias Cancelable(Args...) = bool delegate(Args)[];
+alias Cancelable(Args...) = bool delegate(Args) @safe [];
 
 /// Calls all functions in a regular event
 void emit(T : void delegate(Args), Args...)(T[] events, Args args) {
