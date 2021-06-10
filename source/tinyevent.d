@@ -20,27 +20,17 @@ bool emit(T : bool delegate(Args), Args...)(T[] events, Args args) {
 }
 
 /// Returns true if the type or variable is an Event!(...)
-enum bool isEvent(T) = isEvent!(T.init);
-/// ditto
-enum bool isEvent(alias v) = is(typeof(v.length)) && is(typeof(v) : void delegate(Args)[], Args...);
+enum bool isEvent(T) = is(T : U[], U) && is(U : void delegate (Args), Args...);
 /// Returns true if the type or variable is a Cancelable!(...)
-enum bool isCancelable(T) = isCancelable!(T.init);
-/// ditto
-enum bool isCancelable(alias v) = is(typeof(v.length)) && is(typeof(v) : bool delegate(Args)[], Args...);
+enum bool isCancelable(T) = is(T : U[], U) && is(U : bool delegate (Args), Args...);
 /// Returns true if the type or variable is an Event or Cancelable
-enum bool isEmittable(T) = isEmittable!(T.init);
-/// ditto
-enum bool isEmittable(alias v) = is(typeof(v.length)) && is(typeof(v) : Ret delegate(Args)[], Ret, Args...)
-		&& (is(Ret == bool) || is(Ret == void));
+enum bool isEmittable(T) = isEvent!T || isCancelable!T;
 
 ///
 unittest {
 	Event!string onStringChange;
-	static assert (isEvent!onStringChange);
 	static assert (isEvent!(typeof(onStringChange)));
-	static assert (!isCancelable!onStringChange);
 	static assert (!isCancelable!(typeof(onStringChange)));
-	static assert (isEmittable!onStringChange);
 	static assert (isEmittable!(typeof(onStringChange)));
 	onStringChange ~= (s) { assert(s == "Foo"); };
 	onStringChange.emit("Foo");
@@ -49,11 +39,8 @@ unittest {
 ///
 unittest {
 	Cancelable!int onIntChange;
-	static assert (!isEvent!onIntChange);
 	static assert (!isEvent!(typeof(onIntChange)));
-	static assert (isCancelable!onIntChange);
 	static assert (isCancelable!(typeof(onIntChange)));
-	static assert (isEmittable!onIntChange);
 	static assert (isEmittable!(typeof(onIntChange)));
 	int changed = 0;
 	onIntChange ~= (i) { if(i > 5) return false; changed++; return true; };
@@ -87,28 +74,28 @@ unittest {
 
 unittest {
 	string s;
-	static assert (!isEvent!s);
+	static assert (!isEvent!(typeof(s)));
 	int i;
-	static assert (!isEvent!i);
+	static assert (!isEvent!(typeof(i)));
 	void fn(int i) {
 	}
-	static assert (!isEvent!fn);
-	static assert (isEvent!([&fn]));
+	static assert (!isEvent!(typeof(fn)));
+	static assert (isEvent!(typeof([&fn])));
 	void function()[] fns;
-	static assert (!isEvent!fns);
+	static assert (!isEvent!(typeof(fns)));
 	void delegate()[] dels;
-	static assert (isEvent!dels);
+	static assert (isEvent!(typeof(dels)));
 	Event!int e;
-	static assert (isEvent!e);
+	static assert (isEvent!(typeof(e)));
 	Cancelable!int c;
-	static assert (isCancelable!c);
-	static assert (isEmittable!e && isEmittable!c);
+	static assert (isCancelable!(typeof(c)));
+	static assert (isEmittable!(typeof(e)) && isEmittable!(typeof(c)));
 	Event!() en;
-	static assert (isEvent!en);
+	static assert (isEvent!(typeof(en)));
 	Cancelable!() cn;
-	static assert (isCancelable!cn);
+	static assert (isCancelable!(typeof(cn)));
 	Event!(Event!int, int, string, Object) em;
-	static assert (isEvent!em);
+	static assert (isEvent!(typeof(em)));
 	Cancelable!(Object, string, void function(int, string)) cm;
-	static assert (isCancelable!cm);
+	static assert (isCancelable!(typeof(cm)));
 }
