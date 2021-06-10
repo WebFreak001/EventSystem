@@ -67,6 +67,24 @@ unittest {
 	assert(changed == 2);
 }
 
+// safety tests
+@system unittest {
+	void delegate(string, int, bool) @system [] eventSystem;
+	eventSystem.emit("", 1, true);
+}
+
+@safe unittest {
+	void delegate(string, int, bool) @trusted [] eventTrusted;
+	eventTrusted.emit("", 1, true);
+	void delegate(string, int, bool) @safe [] eventSafe;
+	eventSafe.emit("", 1, true);
+}
+
+@safe nothrow unittest {
+	void delegate(string, int, bool) @safe nothrow [] eventSafe;
+	eventSafe.emit("", 1, true);
+}
+
 unittest {
 	string s;
 	static assert (!isEvent!s);
