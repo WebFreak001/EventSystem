@@ -6,13 +6,13 @@ alias Event(Args...) = void delegate(Args)[];
 alias Cancelable(Args...) = bool delegate(Args)[];
 
 /// Calls all functions in a regular event
-void emit(Args...)(void delegate(Args)[] events, Args args) {
+void emit(T : void delegate(Args), Args...)(T[] events, Args args) {
 	foreach(fn; events)
 		fn(args);
 }
 
 /// Calls all functions in a cancelable event
-bool emit(Args...)(bool delegate(Args)[] events, Args args) {
+bool emit(T : bool delegate(Args), Args...)(T[] events, Args args) {
 	foreach(fn; events)
 		if(!fn(args))
 			return false;
